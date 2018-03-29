@@ -1,0 +1,67 @@
+---
+title: Deleting Spam Tweets from my Account
+author: Mohit Sainani
+date: '2018-01-16'
+slug: deleting-spam-tweets-from-my-account
+categories:
+  - R
+tags:
+  - rtweet
+  - twitteR
+  - twitter-api
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(cache = TRUE, warning = FALSE, message = FALSE, 
+                      echo = TRUE, dpi = 180)
+options(width=80, dplyr.width = 150)
+
+```
+
+A long time ago, on December 5, 2015 to be precise, my twitter account was compromised such that each of my followers were sent a tweet containing a different tumblr blog profile. How exactly this happened I haven't a clue about, but all this spam did leave me perplexed.
+
+Have a look at the following:
+
+```{r, echo=FALSE}
+blogdown::shortcode('tweet', '805583628734341122')
+blogdown::shortcode('tweet', '805583624011554816')
+```
+
+
+
+Sigh. Today, I am going to cleanse it all using the twitter API libraries for R namely: [rtweet](https://cran.r-project.org/web/packages/rtweet/index.html) & [twitteR](https://cran.r-project.org/web/packages/twitteR/index.html). The reason I have used two separate packages is that rtweet, which is newer and a lot more developer friendly compared to twitteR, does not (yet?) seem to provide a method for deleting tweets. I could obviously only use twitteR for this purpose but had already done half the job of obtaing IDs for the tweets in question using the rtweet package.
+
+
+
+```{r, eval=FALSE}
+my_tweets <- rtweet::get_timeline("grimyard", n = 10000, home = T)
+
+```
+
+This data frame reveals the ids of tweets that I've got to delete i.e, row-numbers 110 till 344.
+Next, a for loop will fetch and create objects of class status from the tweetR package and delete each of them one-by-one
+
+```{r, eval=FALSE}
+for (i in c(110:344)){
+  status_obj <- twitteR::showStatus(my_tweets$status_id[i])
+  Sys.sleep(1/10)
+  resp <- twitteR::deleteStatus(status_obj)
+  Sys.sleep(1/10)
+  if(isTRUE(resp)){
+    print(paste0("tweet #", i, " has been deleted"))
+  }
+}
+```
+
+```{r, echo=FALSE, results='hold'}
+print("tweet #110 has been deleted")
+print("tweet #111 has been deleted")
+print(".")
+print(".")
+print(".")
+print("tweet #344 has been deleted")
+```
+
+
+YES! Looks like our work here is done.

@@ -1,0 +1,100 @@
+---
+title: Mobile Device Specifications from GSMArena
+author: Mohit Sainani
+date: '2017-12-29'
+slug: mobile-device-specifications-from-gsmarena
+categories:
+  - R
+tags:
+  - rvest
+---
+
+
+
+<div id="prologue" class="section level1">
+<h1>Prologue</h1>
+<p><a href="http://gsmarena.com/">GSMArena</a> is a gadget review website with a focus on cellular and mobile devices. I believe to have come across the site a long time ago through the now defunct iGoogle start-page. It was among the first few tech blogs among the likes of <a href="https://www.howtogeek.com/">How-To Geek</a>, <a href="http://xda-developers.com/">XDA Developers</a>, <a href="http://androidpolice.com/">Android Police</a>, and <a href="https://www.anandtech.com/">AnandTech</a> that had invoked in me the sort of enthusiasm for gadgets and devices that I have carried on ever since. I hardly ever visit most of these websites anymore.</p>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Over the years, GSMArena has compiled a rich database of mobile device specifications. The decision to scrape off their website - despite there being numerous data sets out in the wild to run analysis upon - was based both upon the excuse to demonstrate (read : hone, sharpen) my data mining skills and the nostalgia attached with working with such a dataset.</p>
+<p>You can find the code used for scraping device specifications <a href="https://github.com/cigarplug/scrape-gsma">here</a> on my GitHub.</p>
+</div>
+<div id="loading-data-into-current-session" class="section level1">
+<h1>Loading data into current session</h1>
+<p>First things first - attaching libraries and reading csv data file</p>
+<pre class="r"><code>library(dplyr)
+library(lattice)
+
+options(stringsAsFactors = F)
+
+gsm.df &lt;- read.csv(&quot;~/data/gsm.csv&quot;)</code></pre>
+</div>
+<div id="data-manipulation" class="section level1">
+<h1>Data Manipulation</h1>
+<div id="filtering-altering-data-types-and-wrangling-for-convenience" class="section level3">
+<h3>(filtering, altering data-types, and wrangling for convenience)</h3>
+<p>Here, we will cast some of the variables to numeric type and also modify the ‘announcement’ variable, which contains the month (or quarter) and year signifying when the mobile device was officially announced for the first time, such as to reflect only the year of announcement.</p>
+<p>We also filter our dataset to remove non-cellular devices such as smartwatches and tablets (screen size &gt;= 6.9 inches; chosen by the virtue of prior knowledge on mobile devices).</p>
+<p>Lastly, at the time of writing the code I hadn’t realized that a few devices have their prices listed in INR instead of EUR. To remove these data points, we also put a filter on the ‘price’ variable for value &lt;= 2000 (prices in INR are higher than 5000 in an overwhelming majority, probabily all, of such cases).</p>
+<pre class="r"><code>numeric_cols &lt;- c(&#39;dim_length&#39;, &#39;dim_breadth&#39;, &#39;dim_thickness&#39;, &#39;weight&#39;, &#39;display_size&#39;, 
+                  &#39;ram&#39;, &#39;battery_mah&#39;, &#39;price&#39;, &#39;announced&#39;
+                  )
+
+# rows where one or more variables are NA are kept as is #
+
+df &lt;- gsm.df %&gt;% filter(tech != &#39;No cellular connectivity&#39;) %&gt;%
+  mutate(announced = stringi::stri_extract_first_regex( announced, &quot;[0-9]+&quot;) ) %&gt;%
+  mutate_at(.vars =  c(numeric_cols), .funs =  as.numeric) %&gt;%
+  filter(display_size &lt; 6.9 | is.na(display_size) ) %&gt;% 
+  filter((ram &lt;= 16 | is.na(ram)) &amp; (price &lt;= 2000 | is.na(price))) %&gt;%
+  filter(!is.na(announced) &amp; announced &gt; 2003)
+
+dim(df)</code></pre>
+<pre><code>## [1] 7475   32</code></pre>
+</div>
+</div>
+<div id="some-simple-plots" class="section level1">
+<h1>Some simple plots</h1>
+<p>Our first graph (below) shows an expected trend of rise in display sizes over the years.</p>
+<p>It appears from looking at the outliers that from 2014 onwards there has been an addition of many devices in our portfolio where display size is lower than 2 inches. Hmm? What’s going on here…</p>
+<p>A closer look at the data points in question reveals that they belong to those of smartwatches which managed to sneak past our ‘no cellular connectivity’ filter. It only makes sense to get rid of these:</p>
+<pre class="r"><code>df &lt;- df %&gt;% filter(!(display_size &lt; 2 &amp; announced &gt;= 2014 &amp; dim_breadth &lt; 60))
+
+bwplot(display_size ~ factor(announced), df, ylab = &#39;Display Size (inches)&#39;, xlab = &#39;Year Announced&#39;, main = &#39;Boxplot: Trends in display size over the years &#39;)</code></pre>
+<p><img src="/blog/2017/2017-12-29-mobile-device-specifications-from-gsmarena_files/figure-html/unnamed-chunk-4-1.png" width="1260" /></p>
+<p>There, fixed it (for now).</p>
+<div id="say-no-to-bezels" class="section level2">
+<h2>Say no to bezels</h2>
+<p><b>Bezel-less display</b> is one of the many buzz words surrounding the cell phone industry these days. The term bezel basically refers to the portion - typically left and right - of a device’s front surface that is not screen estate. Most mobile phones today look more or less the same with their ubiquitous rectangular profile and a display ingrained on the front; However this wasn’t always the case when OEMs were trying to innovate on the design and usability fronts. Some of the popular designs that have gone extinct are flip-phones, phones with slide-out or front-facing hardware keyboards, devices with track-balls or <a href="https://www.youtube.com/watch?v=GqFf9MCXRcQ">built-in projectors</a>, and phones resembling portable gaming consoles.</p>
+<p>One estimate of the size of bezels on a phone is the screen-to-body ratio i.e, percentage of the front surface that forms a display. Although GSMArena provides this metric for devices announced in the last few years, we’d prefer to obtain this number for all devices. This little function which follows does exactly that:</p>
+<pre class="r"><code>sbr &lt;- function(resolution, length, breadth, display_size){
+  
+    # note: industry standard for reporting display size is the measure of diagonal
+    # phone screens are predominantly rectangular in shape (duh).
+  
+    res &lt;- strsplit(resolution, &#39;x&#39;) %&gt;% unlist() %&gt;% as.numeric()
+  
+    # display size converted to milimeters from inches
+    mm &lt;- 25.4*(display_size) 
+  
+    # using pythagoras theorem and ratio-proportions
+    x &lt;- mm/(1 + (res[2]/res[1])^2)**0.5 
+    
+    screen.body.ratio &lt;- (x*(res[2]/res[1])*x) / (length*breadth)
+    return(screen.body.ratio)
+}</code></pre>
+<p>Next, we add this variable to our original data frame:</p>
+<pre class="r"><code>safe_sbr &lt;- purrr::safely(sbr, otherwise = NA)
+
+df &lt;- df %&gt;% rowwise() %&gt;%
+  mutate(sbr = safe_sbr(display_res, dim_length, dim_breadth, display_size) %$% 
+                      result %&gt;% unlist)</code></pre>
+<p>Let’s visualize what these ratios look like over the years:</p>
+<pre class="r"><code>bwplot(sbr ~ factor(announced), df, ylab = &quot;Screen-to-Body Ratio&quot;, xlab = &quot;Year Announced&quot;, 
+       main = paste(&quot;Screen-Body Ratio&quot;, &quot;\nhigher value indicates smaller bezels&quot;)
+       )</code></pre>
+<p><img src="/blog/2017/2017-12-29-mobile-device-specifications-from-gsmarena_files/figure-html/unnamed-chunk-7-1.png" width="1260" /></p>
+<p>Notice how the rectangular boxes keep getting smaller in lenght as we move ahead the x-axis. This shift represents a homegenity in design which the industry seems to have embraced following in the footsteps of the first monolithic iPhone. Outliers below the first quartile also witness a drop in number, signalling a decrease in feature-phone announcements (and/or coverage by GSMArena) as these are typically the devices that have both a display and hardware keypad, and thus a lower screen-body-ratio.</p>
+</div>
+</div>

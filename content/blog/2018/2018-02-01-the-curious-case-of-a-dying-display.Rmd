@@ -1,0 +1,29 @@
+---
+title: The Curious Case of a Dying Display
+author: Mohit Sainani
+date: '2018-02-01'
+slug: the-curious-case-of-a-dying-display
+categories:
+  - R
+tags:
+  - asus
+  - laptop
+  - display
+  - connector
+---
+
+
+It all started sometime around March or April of 2017. I was sittig at my office desk, working on my laptop when its display abruptly went dark. My first conviction was that somebody in the office managed to pull off a prank by remotely 'halting' my system. An SSH daemon listening on the default port along with my single-keystroke password were signs of asking to be taken for a ride, and even more so when coupled with my recent karma. You see, exploiting serialized usernames, default passwords, and the ignorance and simplicity of common folks is certainly not a new concept to me.
+
+Hastily, I forced shut-down the laptop using the power key. Everything ran smoothly upon reboot and neither were there any suspicious commands in my user's bash history. There was calm for weeks before a similar situation was presented to me. This time however I realized that the machine was still running; It was only the monitor that had somehow lost power, and flipping the display lid shut and reopening it presented me with the login screen. Maybe it was some graphic driver that was acting up? At any rate, Linux was (is) infamous for Nvidia card compatibilty issues.
+
+~~(this post is a WIP)~~
+[abandoned]
+
+<!-- Fast forward to November 2017. By now, the frequency of the monitoring hanging up on me had risen to the point of annoyance. Initially,  -->
+
+<!-- With every passing week, the situation kept getting worse and the frequency with which the monitor would hang up on me rose from weekly to daily to multiple times within the span of a minute. I grumbled about the graphic drivers, the operating system and the linux kernel as well for putting me through this pain. Switching from Nouveau open-source drivers to Nvidia's proprietary ones did not help, so I set about to re-install the entire Linux Mint OS. The problem persisted, so I  -->
+
+
+
+<!-- The possibilty of this being a software problem couldn't be ruled out yet, so I made a -->
