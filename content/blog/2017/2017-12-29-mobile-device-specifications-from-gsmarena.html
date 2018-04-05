@@ -66,7 +66,8 @@ bwplot(display_size ~ factor(announced), df, ylab = &#39;Display Size (inches)&#
 <p>There, fixed it (for now).</p>
 <div id="say-no-to-bezels" class="section level2">
 <h2>Say no to bezels</h2>
-<p><b>Bezel-less display</b> is one of the many buzz words surrounding the cell phone industry these days. The term bezel basically refers to the portion - typically left and right - of a device’s front surface that is not screen estate. Most mobile phones today look more or less the same with their ubiquitous rectangular profile and a display ingrained on the front; However this wasn’t always the case when OEMs were trying to innovate on the design and usability fronts. Some of the popular designs that have gone extinct are flip-phones, phones with slide-out or front-facing hardware keyboards, devices with track-balls or <a href="https://www.youtube.com/watch?v=GqFf9MCXRcQ">built-in projectors</a>, and phones resembling portable gaming consoles.</p>
+<p><b>Bezel-less display</b> is one of the many buzz words surrounding the cell phone industry these days. The term bezel basically refers to the portion - typically left and right - of a device’s front surface that is not screen estate.
+Most mobile phones today look more or less the same with their ubiquitous rectangular profile and a display ingrained on the front; However this wasn’t always the case when OEMs were trying to innovate on the design and usability fronts. Some of the popular designs that have gone extinct are flip-phones, phones with slide-out or front-facing hardware keyboards, devices with track-balls or <a href="https://www.youtube.com/watch?v=GqFf9MCXRcQ">built-in projectors</a>, and phones resembling portable gaming consoles.</p>
 <p>One estimate of the size of bezels on a phone is the screen-to-body ratio i.e, percentage of the front surface that forms a display. Although GSMArena provides this metric for devices announced in the last few years, we’d prefer to obtain this number for all devices. This little function which follows does exactly that:</p>
 <pre class="r"><code>sbr &lt;- function(resolution, length, breadth, display_size){
   
@@ -95,6 +96,13 @@ df &lt;- df %&gt;% rowwise() %&gt;%
        main = paste(&quot;Screen-Body Ratio&quot;, &quot;\nhigher value indicates smaller bezels&quot;)
        )</code></pre>
 <p><img src="/blog/2017/2017-12-29-mobile-device-specifications-from-gsmarena_files/figure-html/unnamed-chunk-7-1.png" width="1260" /></p>
-<p>Notice how the rectangular boxes keep getting smaller in lenght as we move ahead the x-axis. This shift represents a homegenity in design which the industry seems to have embraced following in the footsteps of the first monolithic iPhone. Outliers below the first quartile also witness a drop in number, signalling a decrease in feature-phone announcements (and/or coverage by GSMArena) as these are typically the devices that have both a display and hardware keypad, and thus a lower screen-body-ratio.</p>
+<p>Notice how the rectangular boxes keep getting smaller in lenght as we move ahead the x-axis. This shift represents a homegenity in design which the industry seems to have embraced following in the footsteps of the first monolithic iPhone.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>
+Outliers below the first quartile also witness a drop in number, signalling a decrease in feature-phone announcements (and/or coverage by GSMArena) as these are typically the devices that have both a display and hardware keypad, and thus a lower screen-body-ratio.</p>
 </div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Citation Pending<a href="#fnref1" class="footnote-back">↩</a></p></li>
+</ol>
 </div>

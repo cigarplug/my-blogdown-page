@@ -141,4 +141,5 @@ bwplot(sbr ~ factor(announced), df, ylab = "Screen-to-Body Ratio", xlab = "Year 
        )
 ```
 
-Notice how the rectangular boxes keep getting smaller in lenght as we move ahead the x-axis. This shift represents a homegenity in design which the industry seems to have embraced following in the footsteps of the first monolithic iPhone. Outliers below the first quartile also witness a drop in number, signalling a decrease in feature-phone announcements (and/or coverage by GSMArena) as these are typically the devices that have both a display and hardware keypad, and thus a lower screen-body-ratio.
+Notice how the rectangular boxes keep getting smaller in lenght as we move ahead the x-axis. This shift represents a homegenity in design which the industry seems to have embraced following in the footsteps of the first monolithic iPhone.^[Citation Pending]
+ Outliers below the first quartile also witness a drop in number, signalling a decrease in feature-phone announcements (and/or coverage by GSMArena) as these are typically the devices that have both a display and hardware keypad, and thus a lower screen-body-ratio.
